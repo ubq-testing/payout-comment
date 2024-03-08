@@ -44,17 +44,17 @@ async function run() {
   const res = await simplePermitComment(context);
 
   if (!res) {
-    await comment(octokit, "No comment to post");
+    await comment(context, "No comment to post");
   } else {
-    await comment(octokit, res);
+    await comment(context, res);
   }
 }
 
-async function comment(octokit: Octokit, msg: string) {
-  await octokit.issues.createComment({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    issue_number: github.context.issue.number,
+async function comment(context: Context, msg: string) {
+  await context.octokit.issues.createComment({
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name,
+    issue_number: context.payload.issue.number,
     body: msg,
   });
 }
