@@ -15,8 +15,8 @@ export async function simplePermitComment(context: Context) {
 
     return "TODO";
   } else if (permit.type === "erc20-permit") {
-    const { networkId, permit: reward } = permit;
-    const { rpc } = getPayoutConfigByNetworkId(networkId);
+    const { network_id, permit: reward } = permit;
+    const { rpc } = getPayoutConfigByNetworkId(network_id);
 
     const tokenSymbol = await getTokenSymbol(reward.permitted.token, rpc);
     const tokenAmount = new Decimal(reward.permitted.amount);
