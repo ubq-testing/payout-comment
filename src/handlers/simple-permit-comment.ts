@@ -3,29 +3,55 @@
 
 import Decimal from "decimal.js";
 import { Context } from "../types/context";
-import { PermitTransactionData } from "../types/permits";
+import { getTokenSymbol } from "../utils/get-token-symbol";
+import { getPayoutConfigByNetworkId } from "../utils/payout-by-network-id";
 
-export function simplePermitComment(context: Context) {
+export async function simplePermitComment(context: Context) {
   const permit = context.config;
+  const base64encodedClaimData = Buffer.from(JSON.stringify([permit])).toString("base64");
 
-  console.log(permit);
+  if (permit.type === "erc721-permit") {
+    const { nftMetadata, request } = permit;
 
-  // const claimData = [
-  //     ...erc20Permits.map((permit) => ({ type: "erc20-permit", ...permit })),
-  //     ...erc721Permits.map((nftMint) => ({ type: "erc721-permit", ...nftMint })),
-  //   ];
-  //   const base64encodedClaimData = Buffer.from(JSON.stringify(claimData)).toString("base64");
-  //   const claimUrl = new URL("https://pay.ubq.fi/");
-  //   claimUrl.searchParams.append("claim", base64encodedClaimData);
+    return "TODO";
+  } else if (permit.type === "erc20-permit") {
+    const { networkId, permit: reward } = permit;
+    const { rpc } = getPayoutConfigByNetworkId(networkId);
 
-  // const html = generateHtml({
-  //   claimUrl,
-  //   tokenAmount,
-  //   tokenSymbol,
-  //   contributorName,
-  // });
+    const tokenSymbol = await getTokenSymbol(reward.permitted.token, rpc);
+    const tokenAmount = new Decimal(reward.permitted.amount);
 
-  return "result";
+    const contributorName = context.payload.sender.login;
+
+    const claimUrl = new URL("http://localhost:8080/");
+    claimUrl.searchParams.append("claim", base64encodedClaimData);
+
+    return generateHtml({
+      claimUrl,
+      tokenAmount,
+      tokenSymbol,
+      contributorName,
+    });
+  }
+}
+
+function generateHtml({ claimUrl, tokenAmount, tokenSymbol, contributorName }: GenerateHtmlParams) {
+  return `
+  <details>
+    <summary>
+      <b
+        ><h3>
+          <a
+            href="${claimUrl.toString()}"
+          >
+            [ ${tokenAmount} ${tokenSymbol} ]</a
+          >
+        </h3>
+        <h6>@${contributorName}</h6></b
+      >
+    </summary>
+  </details>
+  `;
 }
 
 // function generateContributionsOverview(userScoreDetails: TotalsById, issue: GitHubIssue) {
@@ -178,6 +204,6 @@ interface GenerateHtmlParams {
   tokenAmount: Decimal;
   tokenSymbol: string;
   contributorName: string;
-  contributionsOverviewTable: string;
-  detailsTable: string;
+  contributionsOverviewTable?: string;
+  detailsTable?: string;
 }

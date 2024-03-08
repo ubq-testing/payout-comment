@@ -24,7 +24,7 @@ export interface PermitTransactionData extends Erc20PermitTransactionData, Erc72
 
 type PermitType = "erc20-permit" | "erc721-permit";
 
-interface Erc20PermitTransactionData {
+export interface Erc20PermitTransactionData {
   type: PermitType;
   permit: {
     permitted: {
@@ -43,23 +43,7 @@ interface Erc20PermitTransactionData {
   networkId: number;
 }
 
-interface Erc721PermitTransactionData {
-  type: PermitType;
-  permit: {
-    permitted: {
-      token: string;
-      amount: string;
-    };
-    nonce: string;
-    deadline: string;
-  };
-  transferDetails: {
-    to: string;
-    requestedAmount: string;
-  };
-  owner: string;
-  signature: string;
-  networkId: number;
+export interface Erc721PermitTransactionData extends Erc20PermitTransactionData {
   nftMetadata: {
     GITHUB_ORGANIZATION_NAME: string;
     GITHUB_REPOSITORY_NAME: string;

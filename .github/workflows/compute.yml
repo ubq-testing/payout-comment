@@ -1,4 +1,4 @@
-name: Permit Generation
+name: Permit Comment
 
 on:
   workflow_dispatch:

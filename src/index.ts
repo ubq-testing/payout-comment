@@ -41,7 +41,22 @@ async function run() {
     },
   };
 
-  return simplePermitComment(context);
+  const res = await simplePermitComment(context);
+
+  if (!res) {
+    await comment(octokit, "No comment to post");
+  } else {
+    await comment(octokit, res);
+  }
+}
+
+async function comment(octokit: Octokit, msg: string) {
+  await octokit.issues.createComment({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: github.context.issue.number,
+    body: msg,
+  });
 }
 
 run()
